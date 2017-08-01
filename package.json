@@ -32,11 +32,7 @@
     "postcss-nested": "^1.0.0",
     "webpack": "^1.13.1"
   },
-  "babel": {
-    "presets": [
-      "es2015"
-    ]
-  },
+  
   "main": "gulpfile.js",
   "scripts": {
     "test": "echo \"Error: no test specified\" && exit 1"
