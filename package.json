@@ -20,6 +20,7 @@
     "gulp": "^3.9.1",
     "gulp-cssnano": "^2.1.2",
     "gulp-imagemin": "^3.0.3",
+    "gulp-mocha": "^4.3.1",
     "gulp-modernizr": "^1.0.0-alpha",
     "gulp-postcss": "^6.1.1",
     "gulp-rename": "^1.2.2",
@@ -30,6 +31,11 @@
     "postcss-import": "^8.1.2",
     "postcss-nested": "^1.0.0",
     "webpack": "^1.13.1"
+  },
+  "babel": {
+    "presets": [
+      "es2015"
+    ]
   },
   "main": "gulpfile.js",
   "scripts": {

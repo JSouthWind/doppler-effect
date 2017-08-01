@@ -66,7 +66,11 @@
 
 	var _createClass = function () { function defineProperties(target, props) { for (var i = 0; i < props.length; i++) { var descriptor = props[i]; descriptor.enumerable = descriptor.enumerable || false; descriptor.configurable = true; if ("value" in descriptor) descriptor.writable = true; Object.defineProperty(target, descriptor.key, descriptor); } } return function (Constructor, protoProps, staticProps) { if (protoProps) defineProperties(Constructor.prototype, protoProps); if (staticProps) defineProperties(Constructor, staticProps); return Constructor; }; }();
 
-	var _Doppler = __webpack_require__(2);
+	var _Constants = __webpack_require__(2);
+
+	var _Constants2 = _interopRequireDefault(_Constants);
+
+	var _Doppler = __webpack_require__(3);
 
 	var _Doppler2 = _interopRequireDefault(_Doppler);
 
@@ -81,15 +85,10 @@
 	    this.input = document.getElementById('input');
 	    this.slider = document.getElementById('slider');
 	    this.overlay = document.getElementById('overlay');
-
-	    //choose the right function interval
-	    this.moveInterval = -150;
-	    this.minInput = -100;
-	    this.maxInput = 100;
-	    this.opacityMax = 0.6;
-
-	    this.doppler = new _Doppler2.default(this.moveInterval, this.minInput, this.maxInput, this.opacityMax);
+	    this.consts = new _Constants2.default();
+	    this.doppler = new _Doppler2.default(this.consts.moveInterval, this.consts.minInput, this.consts.maxInput, this.consts.opacityMax);
 	    this.setMaxMinControls();
+
 	    //connect input to slider
 	    this.doppler.inputToSlider(0);
 
@@ -121,10 +120,10 @@
 	  }, {
 	    key: 'setMaxMinControls',
 	    value: function setMaxMinControls() {
-	      this.slider.setAttribute('min', this.minInput);
-	      this.slider.setAttribute('max', this.maxInput);
-	      this.input.setAttribute('min', this.minInput);
-	      this.input.setAttribute('max', this.maxInput);
+	      this.slider.setAttribute('min', this.consts.minInput);
+	      this.slider.setAttribute('max', this.consts.maxInput);
+	      this.input.setAttribute('min', this.consts.minInput);
+	      this.input.setAttribute('max', this.consts.maxInput);
 	    }
 
 	    //limit input
@@ -132,9 +131,9 @@
 	  }, {
 	    key: 'limitInput',
 	    value: function limitInput(val) {
-	      if (val > 100) {
-	        val = 100;
-	      } else if (val < -100) val = -100;
+	      if (val > this.consts.maxInput) {
+	        val = this.consts.maxInput;
+	      } else if (val < this.consts.minInput) val = this.consts.minInput;
 	      this.input.value = val;
 	      return val;
 	    }
@@ -149,6 +148,30 @@
 /* 2 */
 /***/ (function(module, exports) {
 
+	"use strict";
+
+	Object.defineProperty(exports, "__esModule", {
+	  value: true
+	});
+
+	function _classCallCheck(instance, Constructor) { if (!(instance instanceof Constructor)) { throw new TypeError("Cannot call a class as a function"); } }
+
+	var Constants = function Constants() {
+	  _classCallCheck(this, Constants);
+
+	  //choose the right function interval
+	  this.moveInterval = -150;
+	  this.minInput = -100;
+	  this.maxInput = 100;
+	  this.opacityMax = 0.6;
+	};
+
+	exports.default = Constants;
+
+/***/ }),
+/* 3 */
+/***/ (function(module, exports, __webpack_require__) {
+
 	'use strict';
 
 	Object.defineProperty(exports, "__esModule", {
@@ -157,43 +180,47 @@
 
 	var _createClass = function () { function defineProperties(target, props) { for (var i = 0; i < props.length; i++) { var descriptor = props[i]; descriptor.enumerable = descriptor.enumerable || false; descriptor.configurable = true; if ("value" in descriptor) descriptor.writable = true; Object.defineProperty(target, descriptor.key, descriptor); } } return function (Constructor, protoProps, staticProps) { if (protoProps) defineProperties(Constructor.prototype, protoProps); if (staticProps) defineProperties(Constructor, staticProps); return Constructor; }; }();
 
+	var _Constants = __webpack_require__(2);
+
+	var _Constants2 = _interopRequireDefault(_Constants);
+
+	function _interopRequireDefault(obj) { return obj && obj.__esModule ? obj : { default: obj }; }
+
 	function _classCallCheck(instance, Constructor) { if (!(instance instanceof Constructor)) { throw new TypeError("Cannot call a class as a function"); } }
 
 	var Doppler = function () {
-	  function Doppler(moveInterval, minInput, maxInput, opacity) {
+	  function Doppler() {
 	    _classCallCheck(this, Doppler);
 
-	    this.moveInterval = moveInterval;
-	    this.minInput = minInput;
-	    this.maxInput = maxInput;
-	    this.minPos = minInput + moveInterval;
-	    this.maxPos = maxInput + moveInterval;
+	    this.consts = new _Constants2.default();
+	    this.minPos = this.consts.minInput + this.consts.moveInterval;
+	    this.maxPos = this.consts.maxInput + this.consts.moveInterval;
 	    this.minLog = Math.log(-this.minPos);
 	    this.maxLog = Math.log(-this.maxPos);
 	    this.opacityMin = 0;
-	    this.opacityMax = opacity;
+	    this.opacityMax = this.consts.opacity;
 	  }
 
 	  _createClass(Doppler, [{
 	    key: 'sliderToInput',
 	    value: function sliderToInput(pos) {
-	      var posLog = Math.log(-this.moveInterval - pos),
-	          inputVal = this.scaleAtoB(posLog, this.minLog, this.maxLog, this.minInput, this.maxInput);
+	      var posLog = Math.log(-this.consts.moveInterval - pos),
+	          inputVal = this.scaleAtoB(posLog, this.minLog, this.maxLog, this.consts.minInput, this.consts.maxInput);
 	      return { val: Math.round(inputVal * 10) / 10,
 	        opacity: this.changeColor(inputVal) };
 	    }
 	  }, {
 	    key: 'inputToSlider',
 	    value: function inputToSlider(val) {
-	      var posLog = this.scaleAtoB(val, this.minInput, this.maxInput, this.minLog, this.maxLog);
-	      var pos = -Math.exp(posLog) - this.moveInterval;
-	      return { pos: pos, opacity: this.changeColor(val) };
+	      var posLog = this.scaleAtoB(val, this.consts.minInput, this.consts.maxInput, this.minLog, this.maxLog);
+	      var pos = -Math.exp(posLog) - this.consts.moveInterval;
+	      return { pos: Math.round(pos), opacity: this.changeColor(val) };
 	    }
 	  }, {
 	    key: 'changeColor',
 	    value: function changeColor(num) {
 	      return { color: num > 0 ? 'red' : 'blue',
-	        num: this.scaleAtoB(Math.abs(num), 0, this.maxInput, 0, this.opacityMax) };
+	        num: this.scaleAtoB(Math.abs(num), 0, this.consts.maxInput, 0, this.consts.opacityMax) };
 	    }
 
 	    //scale one interval to another

@@ -1,3 +1,4 @@
+import Constants from './Constants';
 import Doppler from './Doppler';
 
 class PutToHtml {
@@ -5,15 +6,10 @@ class PutToHtml {
     this.input = document.getElementById('input');
     this.slider = document.getElementById('slider');
     this.overlay = document.getElementById('overlay');
-    
-    //choose the right function interval
-    this.moveInterval = -150;
-    this.minInput = -100;
-    this.maxInput = 100;
-    this.opacityMax = 0.6;
-
-    this.doppler = new Doppler(this.moveInterval, this.minInput, this.maxInput, this.opacityMax);
+    this.consts = new Constants();
+    this.doppler = new Doppler(this.consts.moveInterval, this.consts.minInput, this.consts.maxInput, this.consts.opacityMax);
     this.setMaxMinControls();
+    
     //connect input to slider
     this.doppler.inputToSlider(0);
     
@@ -40,17 +36,17 @@ class PutToHtml {
   }
   
   setMaxMinControls() {
-    this.slider.setAttribute('min', this.minInput);
-    this.slider.setAttribute('max', this.maxInput);
-    this.input.setAttribute('min', this.minInput);
-    this.input.setAttribute('max', this.maxInput);
+    this.slider.setAttribute('min', this.consts.minInput);
+    this.slider.setAttribute('max', this.consts.maxInput);
+    this.input.setAttribute('min', this.consts.minInput);
+    this.input.setAttribute('max', this.consts.maxInput);
   }
   
   //limit input
   limitInput(val) {
-    if (val > 100) {
-      val = 100
-    } else if (val < -100) val = -100;
+    if (val > this.consts.maxInput) {
+      val = this.consts.maxInput
+    } else if (val < this.consts.minInput) val = this.consts.minInput;
     this.input.value = val;
     return val;
   }
